@@ -9,13 +9,16 @@ try:
 except IOError:
     README = ''
 
-REQUIRES=open(os.path.join(HERE, "requirements.txt")).readlines()
+try:
+  REQUIRES=open(os.path.join(HERE, "requirements.txt")).readlines()
+except IOError:
+  REQUIRES=[]
 
 
 setup(
   name='trivio',
   packages=find_packages(),
-  version='0.2.0a',
+  version='0.2.2',
   description='triv.io command line client',
   long_description=README,
   author='Scott Robertson',
@@ -36,8 +39,4 @@ setup(
     ]
   },
   install_requires=REQUIRES,
-  include_package_data = True,
-  package_data = {
-    '': ['*.txt', '*.md'],
-  }   
 )
