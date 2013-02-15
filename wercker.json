@@ -8,6 +8,6 @@
   ],
   
   "customSteps": [
-    "nosetests"
+    "nosetests -v"
   ]
 }
