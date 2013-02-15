@@ -1,5 +1,5 @@
 {
   "lang": "python",
   "version": "2.7",
-  "preInstallScripts" : ["apt-get install libevent-dev"]
+  "preInstallScripts" : ["echo installing libevent", "apt-get install libevent-dev"]
 }
