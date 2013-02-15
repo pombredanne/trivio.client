@@ -18,7 +18,6 @@ class TestCommandLine(TestCase):
     
   def tearDown(self):
     shutil.rmtree(self.cookie_dir)
-    HTTPretty.disable()
   
   def auth_input(self):
     return 'user', 'password'
@@ -27,9 +26,8 @@ class TestCommandLine(TestCase):
     return None
     
 
-
+  @httprettified
   def test_projects(self):
-    HTTPretty.enable()
     HTTPretty.register_uri(HTTPretty.GET, 
       "http://test.triv.io/",
       body="redirect",
