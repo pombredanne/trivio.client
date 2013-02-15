@@ -2,3 +2,6 @@ mechanize
 requests
 websocket
 python-dateutil==1.5
+docopt
+schema
+nose
