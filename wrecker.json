@@ -2,11 +2,5 @@
   "lang": "python",
   "version": "2.7",
   
-  "customSteps" : {
-      "setup_environment" : {
-        "commands": [
-          "apt-get install libevent-dev"
-        ]
-      },
-    }
+  "platform" : ["apt-get install libevent-dev"]
 }
