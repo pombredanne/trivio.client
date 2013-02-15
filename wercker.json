@@ -12,6 +12,7 @@
   ],
   
   "deploy":[
+    "deploy/setup_pypi.sh",
     "python setup.py sdist upload"
   ]
   
