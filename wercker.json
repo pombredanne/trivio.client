@@ -9,5 +9,10 @@
   
   "customSteps": [
     "nosetests -v"
+  ],
+  
+  "deploy":[
+    "python setup.py sdist upload"
   ]
+  
 }
