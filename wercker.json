@@ -2,5 +2,5 @@
   "lang": "python",
   "version": "2.7",
   
-  "platform" : ["apt-get install libevent-dev"]
+  "preInstallScripts" : ["apt-get install libevent-dev"]
 }
