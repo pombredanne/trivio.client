@@ -239,11 +239,11 @@ def target_cmd(settings_path, target_url=None):
   open(settings_path, 'w').write(json.dumps(settings))
   return settings
  
-def list_cmd(client):
+def list_cmd(client,out=sys.stdout):
   """Print a list of each project for the logged in user."""
 
   for project in client.projects():
-    print project
+    out.write("{}\n".format(project))
     
     
 def pull_cmd(client):

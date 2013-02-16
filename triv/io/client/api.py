@@ -1,6 +1,7 @@
 import json
 import os
 from functools import partial
+import urllib2
 
 from dateutil.parser import parse as parse_date
 
@@ -28,9 +29,9 @@ class Client(object):
       cj.load(cookie_path)
 
     self.br.set_cookiejar(cj)
-    self.login()
-    assert self.br.geturl().endswith('integrated')
-    cj.save(cookie_path)
+    #self.login()
+    #assert self.br.geturl().endswith('integrated')
+    #cj.save(cookie_path)
 
 
   @property
@@ -41,7 +42,13 @@ class Client(object):
     )
 
   def get(self, relative_url, *args, **kw):
-    return requests.get(self.base_url + relative_url, cookies=self.cookies, *args, **kw)
+    resp = requests.get(self.base_url + relative_url, cookies=self.cookies, *args, **kw)
+
+    if resp.status_code == 401:
+      self.login()
+      resp = requests.get(self.base_url + relative_url, cookies=self.cookies, *args, **kw)
+      
+    return resp
     
   def post(self, relative_url, data=None):
     return requests.post(self.base_url + relative_url, data, cookies=self.cookies)
@@ -65,7 +72,12 @@ class Client(object):
   def login(self):
     br = self.br
 
-    br.open(self.base_url)
+    try:
+      br.open(self.base_url)
+    except urllib2.HTTPError:
+      pass
+
+
 
     if not br.geturl().endswith('integrated'):
       # login with github
@@ -78,6 +90,8 @@ class Client(object):
         br.select_form(nr=0)
         br['login'], br['password']  = self.auth_input()
         br.submit()
+      
+      self.cookiejar.save(self.cookie_path)
       
   def create_project(self, **kw):
     resp = self.post("/workspaces", kw)

@@ -10,7 +10,7 @@ import os
 import shutil
 
 
-class TestCommandLine(TestCase):
+class TestApi(TestCase):
   
   def setUp(self):
     self.cookie_dir = mkdtemp()
@@ -24,6 +24,53 @@ class TestCommandLine(TestCase):
       
   def test_success(self):
     return None
+    
+  @httprettified
+  def test_unathorized(self):
+    def request_callback(method, uri, headers):
+      headers['content_type'] = "text/html"
+      headers['status'] = 401
+      return '<html><body><a href="http://github.example.com"/><body></html>'
+    
+    HTTPretty.register_uri(HTTPretty.GET,
+      "http://test.triv.io/",
+      body=request_callback
+    )
+    
+    HTTPretty.register_uri(HTTPretty.GET,
+      "http://test.triv.io/workspaces/",
+      responses=[
+        HTTPretty.Response(
+          body="access denied",
+          status=401
+        ),
+        HTTPretty.Response(
+          body='[]',
+          content_type="application_json"
+        )
+        
+      ]
+    )
+    
+    HTTPretty.register_uri(HTTPretty.GET,
+      "http://github.example.com/",
+      body="redirecting",
+      status=302,
+      location="http://test.triv.io/integrated"
+    )
+    
+    # todo, create a real api-end point for logins
+    HTTPretty.register_uri(HTTPretty.GET,
+      "http://test.triv.io/integrated",
+      body="you made it",
+    )
+           
+    conn = Client(
+      "test.triv.io", 
+      auth_input=self.auth_input,
+      cookie_path=self.cookie_path
+    )
+    conn.projects()
     
 
   @httprettified
