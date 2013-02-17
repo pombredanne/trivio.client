@@ -20,8 +20,8 @@ $ trivio login
   with the github servers, we never see or store your user name and
   password. Don't believe us? Have a look at the trivio client source.
   
-  Github username: 
-  Git hub password:
+  GitHub username: 
+  GitHub password:
 ``` 
 
 Create your first project

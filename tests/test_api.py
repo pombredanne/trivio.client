@@ -11,6 +11,9 @@ import shutil
 
 
 class TestApi(TestCase):
+  """
+  Test verifying proper interpetation of the triv.io api.
+  """
   
   def setUp(self):
     self.cookie_dir = mkdtemp()
@@ -30,7 +33,13 @@ class TestApi(TestCase):
     def request_callback(method, uri, headers):
       headers['content_type'] = "text/html"
       headers['status'] = 401
-      return '<html><body><a href="http://github.example.com"/><body></html>'
+      return (
+        '<html><head><title>Triv.io Beta</title></head>'
+        '<body>'
+        '<a href="https://github.com/login/oauth/authorize"/>'
+        '</body>'
+        '</html>'
+      )
     
     HTTPretty.register_uri(HTTPretty.GET,
       "http://test.triv.io/",
@@ -53,7 +62,7 @@ class TestApi(TestCase):
     )
     
     HTTPretty.register_uri(HTTPretty.GET,
-      "http://github.example.com/",
+      "https://github.com/login/oauth/authorize",
       body="redirecting",
       status=302,
       location="http://test.triv.io/integrated"

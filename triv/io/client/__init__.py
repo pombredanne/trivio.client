@@ -139,6 +139,20 @@ def current_target(settings_path):
     
   return settings['target_url']
 
+def login_cmd(client):
+  """
+  Authenticate with new credentials.
+  """
+  
+  print """
+  Triv.io uses github for authentication. You'll need a github 
+  username and password to proceed. Authentication is done directly
+  with the github servers, we never see or store your user name and
+  password. Don't believe us? Have a look at the trivio client source.
+  """
+  
+  client.login()
+
 def create_cmd(client, title, *repos):
   """
   Creates a new project, ensuring the user is not under a project directory first.

@@ -29,9 +29,6 @@ class Client(object):
       cj.load(cookie_path)
 
     self.br.set_cookiejar(cj)
-    #self.login()
-    #assert self.br.geturl().endswith('integrated')
-    #cj.save(cookie_path)
 
 
   @property
@@ -70,6 +67,7 @@ class Client(object):
     return map(lambda d: Project(session=self, **d), projects)
     
   def login(self):
+    self.cookiejar.clear()
     br = self.br
 
     try:
@@ -77,21 +75,25 @@ class Client(object):
     except urllib2.HTTPError:
       pass
 
-
-
-    if not br.geturl().endswith('integrated'):
-      # login with github
-      response = br.follow_link()
-
-      if br.geturl().endswith('integrated'):
-        # github redirected us back, we're good to go
-        return
-      else:
+    hops = 3
+    while not br.geturl().endswith('integrated'):
+      assert hops > 0, "To many hops" # guard against broken urls
+      if  br.title() == "Triv.io Beta":
+        response = br.follow_link()
+      elif br.geturl().startswith('https://github.com/login?'):
         br.select_form(nr=0)
         br['login'], br['password']  = self.auth_input()
         br.submit()
+        self.cookiejar.save(self.cookie_path)
+      elif br.geturl().startswith('https://github.com/login/oauth/authorize'):
+        br.select_form(nr=1)
+        br.submit()
+      else:
+        raise RuntimeError("Unknown state, did github change their login flow?")
       
-      self.cookiejar.save(self.cookie_path)
+      hops -= 1
+      
+    self.cookiejar.save(self.cookie_path)
       
   def create_project(self, **kw):
     resp = self.post("/workspaces", kw)
