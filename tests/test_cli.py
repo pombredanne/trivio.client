@@ -1,5 +1,9 @@
 import sys
 from StringIO import StringIO
+from tempfile import mkdtemp
+import os
+import shutil
+import json
 
 from unittest import TestCase
 from nose.tools import eq_
@@ -7,11 +11,9 @@ from httpretty import httprettified
 from mock import Mock
 
 from triv.io import client as cli
+from triv.io.client import api
 import helper
 
-from tempfile import mkdtemp
-import os
-import shutil
 
 class TestCli(object):
   """
@@ -44,25 +46,56 @@ class TestCli(object):
     self.contains("Triv.io uses github for authentication.")
 
 
-
   def test_create_new_project(self):
     session = Mock()
+    session.create_project.return_value = api.Project(
+      id="123",
+      title="acceptance",
+      repositories=[dict(
+        git_url="https://github.com/trivio/acceptance.git",
+        name="acceptance"
+      )]
+    )    
     
-    session.create_project.return_value = '{}'    
+
     cli.create_cmd(session, "acceptance")
     
-    self.contains("Creating project directory")
-    self.contains("Creating repositories")
-    self.contains("Creating trivio project")
+    self.contains("Creating triv.io project")
+    self.contains("Cloning repository")
+    self.contains("Saving project settings to acceptance/.trivio.project")
     
     assert session.create_project.called
     assert os.path.isdir('acceptance') # command should create an directory
     assert os.path.isfile('acceptance/.trivio.project')
-    assert os.path.isfile('acceptance/.git')
-    #assert os.path.path.isfile('acceptance/README')
+    assert os.path.isdir('acceptance/.git')
+
     
+  def test_create_project_from_repo(self):
+    session = Mock()
+
+    session.create_project.return_value = api.Project(
+      session=session,
+      id="123",
+      title="acceptance",
+      repositories=[dict(
+        git_url="https://github.com/trivio/acceptance.git",
+        name="acceptance"
+      )]
+    )    
     
+    cli.create_cmd(session, "https://github.com/trivio/acceptance.git")
+
+
+    assert session.create_project.called
+    assert os.path.isdir('acceptance') # command should create an directory
+    assert os.path.isfile('acceptance/.trivio.project')
+    assert os.path.isdir('acceptance/.git')
+    assert os.path.isfile('acceptance/README')
     
+    self.contains("Creating triv.io project")
+    self.contains("Cloning repository")
+    self.contains("Saving project settings to acceptance/.trivio.project")
     
+  
     
     

@@ -6,6 +6,7 @@ import sys
 import re
 import time
 from urlparse import urlparse
+import subprocess
 
 import api
 
@@ -159,15 +160,22 @@ def create_cmd(client, title, *repos):
   """
   assert current_project(client) is None
   
-  print "Creating project directory"
-  os.mkdir(title)
-  print "Creating repositories"
-  os.mkdir(os.path.join(title, "repositories"))
-  
-  
-  print "Creating trivio project"
+  print "Creating triv.io project"
   project = client.create_project(title=title)
-  open(os.path.join(title, PROJECT_FILE), 'w').write(project)
+  
+  print "Cloning repository"
+  subprocess.call(["git", "clone", project.repositories[0]['git_url'], project.title])
+  
+    
+  print "Saving project settings to {}/{}".format(project.title, PROJECT_FILE)
+
+  
+  open(os.path.join(project.title, PROJECT_FILE), 'w').write(json.dumps(dict(
+      id=project.id, 
+      title=project.title, 
+      repositories=project.repositories
+  )))
+  
 
 
 def checkout_cmd(client, title_or_id=None):

@@ -97,7 +97,7 @@ class Client(object):
       
   def create_project(self, **kw):
     resp = self.post("/workspaces", kw)
-    return resp.content
+    return Project(**resp.json)
     
   def rebuild(self, project_id, keep):
     if keep:
@@ -209,11 +209,17 @@ class Project(object):
     )
     
 
-
   @property
   def repositories(self):
-    return self.session.get('/workspaces/{}/repos'.format(self.id)).json()
-      
+    if not hasattr(self, '_repos'):
+      self._repos = self.session.get('/workspaces/{}/repos'.format(self.id)).json()
+    return self._repos
+  
+  @repositories.setter
+  def repositories(self, value):
+    self._repos = value
+    
+
   def subscribe(self, callback):
 
     def on_open(socket, *args, **kw):
