@@ -8,3 +8,4 @@ schema
 # for testing
 nose
 httpretty
+mock
