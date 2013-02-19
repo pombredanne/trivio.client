@@ -49,7 +49,9 @@ class Client(object):
     
   def post(self, relative_url, data=None):
     return requests.post(self.base_url + relative_url, data, cookies=self.cookies)
-
+    
+  def delete(self, relative_url):
+    return requests.delete(self.base_url + relative_url,cookies=self.cookies)
     
   @property
   def cookies(self):
@@ -97,7 +99,7 @@ class Client(object):
       
   def create_project(self, **kw):
     resp = self.post("/workspaces", kw)
-    return Project(**resp.json)
+    return Project(session=self, **resp.json())
     
   def rebuild(self, project_id, keep):
     if keep:
@@ -181,6 +183,10 @@ class Project(object):
       '/workspaces/{}/resume'.format(self.id)
     )
     
+  def remove(self):
+    return self.session.delete(
+      '/workspaces/{}'.format(self.id)
+    )
 
   def simulate(self, target, **headers):
     return self.session.get(

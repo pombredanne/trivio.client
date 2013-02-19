@@ -158,10 +158,14 @@ def create_cmd(client, title, *repos):
   """
   Creates a new project, ensuring the user is not under a project directory first.
   """
+  title = title.strip()
   assert current_project(client) is None
   
   print "Creating triv.io project"
-  project = client.create_project(title=title)
+  if title.endswith('.git'):
+    project = client.create_project(git_url=title)
+  else:
+    project = client.create_project(title=title)
   
   print "Cloning repository"
   subprocess.call(["git", "clone", project.repositories[0]['git_url'], project.title])
@@ -169,7 +173,6 @@ def create_cmd(client, title, *repos):
     
   print "Saving project settings to {}/{}".format(project.title, PROJECT_FILE)
 
-  
   open(os.path.join(project.title, PROJECT_FILE), 'w').write(json.dumps(dict(
       id=project.id, 
       title=project.title, 
@@ -242,14 +245,19 @@ def remove_cmd(client, project_id=None):
   Removes the idetified project, if no project was specified prompts the user
   to select the project to remove.
   """
+  project = None
   if project_id is None:
     projects = client.projects()
 
     for i, p in enumerate(projects):
       print "  {}: {.title}".format(i,p)
     x = int(raw_input("Enter project to remove: "))
-    project_id = projects[i].id
-  print "removing " + project_id
+    
+    project = projects[i]
+    print "removing " + project.id
+    project.remove()
+  
+
     
 def target_cmd(settings_path, target_url=None):
   if target_url is None:
