@@ -169,3 +169,7 @@ That's the basic workflow
 * Check out our [blog](http://docs.triv.io/) for cool projects, tips and tricks
 
 
+
+
+[![Bitdeli Badge](https://d2weczhvl823v0.cloudfront.net/trivio/trivio.client/trend.png)](https://bitdeli.com/free "Bitdeli Badge")
+
