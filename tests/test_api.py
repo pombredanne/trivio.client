@@ -110,13 +110,4 @@ class TestApi(TestCase):
     
     eq_(len(conn.projects()), 1)
 
-  @httprettified
-  def test_cluster_start(self):
-    conn = Client(
-      "test.triv.io", 
-      auth_input=self.auth_input,
-      cookie_path=self.cookie_path
-    )
-    
-    conn.project
-    
+  
