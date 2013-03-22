@@ -18,7 +18,7 @@ except IOError:
 setup(
   name='trivio',
   packages=find_packages(),
-  version='0.2.4',
+  version='0.2.5',
   description='triv.io command line client',
   long_description=README,
   author='Scott Robertson',

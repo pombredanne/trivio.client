@@ -5,8 +5,11 @@ import os
 import sys
 import re
 import time
-from urlparse import urlparse
 import subprocess
+
+from getpass import getpass
+from urlparse import urlparse
+
 
 import api
 
@@ -25,8 +28,15 @@ PARSE_GITHUB_URL=re.compile('git@github.com:(\w+)/(\w+).git')
 default_url="http://app.triv.io:80"
 
 def auth_input():
-  login = raw_input('login: ')
-  password = raw_input('password: ')
+  print """
+  Triv.io uses github for authentication. You'll need a github 
+  username and password to proceed. Authentication is done directly
+  with the github servers, we never see or store your user name and
+  password. Don't believe us? Have a look at the trivio client source.
+  """
+
+  login = raw_input('github user: ')
+  password = getpass('password: ')
   return login, password
 
 def format_delay(seconds):
@@ -145,12 +155,6 @@ def login_cmd(client):
   Authenticate with new credentials.
   """
   
-  print """
-  Triv.io uses github for authentication. You'll need a github 
-  username and password to proceed. Authentication is done directly
-  with the github servers, we never see or store your user name and
-  password. Don't believe us? Have a look at the trivio client source.
-  """
   
   client.login()
 
@@ -219,6 +223,19 @@ def checkout_cmd(client, title_or_id=None):
     os.mkdir('repositories')
     os.chdir('repositories')
     return pull_cmd(client)
+
+
+def cluster_cmd(client, cmd=None):
+  project = current_project(client)
+  if cmd == None:
+    print project.cluster_status().content
+
+  elif re.match('^http(s?)://\w+', cmd):
+    print project.cluster_set(cmd)
+  elif cmd == 'start':
+    print project.cluster_start()
+  elif cmd == 'stop':
+    print project.cluster_stop()
 
 def import_cmd(client, git_url):
   project = current_project(client)
@@ -316,17 +333,7 @@ def push_cmd(client, msg="pushing", keep=False):
 
   project = current_project(client)
   # getting the current project should put us in the correct directory  
-
-  curdir = os.getcwd()
-  os.chdir('repositories')
-  for owner in os.listdir('.'):
-    print "changing to " + owner
-    os.chdir(owner)
-    for repo in os.listdir('.'):
-      os.chdir(repo)
-      os.system('git commit -am "{}"; git push'.format(msg))
-      os.chdir('..')
-    os.chdir('..')
+  os.system('git commit -am "{}"; git push'.format(msg))
   client.rebuild(project.id, keep)
 
 def rebuild_cmd(client, table=None, segment=None):
@@ -341,6 +348,7 @@ def rebuild_cmd(client, table=None, segment=None):
 def query_cmd(client, query_str, accept="application/x-json-stream"):
   print query_str
   project = current_project(client)
+  
 
   for chunk in project.query(query_str, accept=accept).iter_content(chunk_size=10240):
     sys.stdout.write(chunk)
@@ -377,7 +385,7 @@ def simulate_cmd(client, target, accept='application/x-json-stream'):
   for chunk in project.simulate(target, accept=accept).iter_content(chunk_size=10240):
     sys.stdout.write(chunk)
 
-def step_cmd(client, target):
+def step_cmd(client, target=None):
   project = current_project(client)
   print project.step(target).content
 

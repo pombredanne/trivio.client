@@ -158,6 +158,27 @@ class Project(object):
   def failed(self):
     return self.filter('failed')
 
+  def cluster_set(self,master_url):
+    return  self.session.post(
+      '/workspaces/{}/cluster'.format(self.id),
+      data=dict(master_url=master_url)
+    )
+
+
+  def cluster_status(self):
+    return  self.session.get(
+      '/workspaces/{}/cluster'.format(self.id)
+    )
+    
+  def cluster_start(self):
+    return self.session.post(
+      '/workspaces/{}/cluster'.format(self.id)
+    )
+    
+  def cluster_stop(self):
+    return self.session.delete(
+      '/workspaces/{}/cluster'.format(self.id)
+    )
 
   def next_build_in(self):
     # returns the number of seconds until the next build or INFINITY
@@ -196,9 +217,16 @@ class Project(object):
     )
     
   def step(self, target):
-    return self.session.post(
-      '/workspaces/{}/step/{}'.format(self.id, target),
-    )
+    if target:
+      return self.session.post(
+        '/workspaces/{}/step/{}'.format(self.id, target)
+      )
+    else:
+      return self.session.post(
+        '/workspaces/{}/step'.format(self.id)
+      )
+      
+      
   
     
         
