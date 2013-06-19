@@ -6,11 +6,11 @@ import urllib2
 from dateutil.parser import parse as parse_date
 
 import gevent
-
-
 import mechanize
-import requests
 import websocket
+
+import requests
+
 
 INFINITY = float('inf')
 
@@ -20,7 +20,6 @@ class Client(object):
     self.port = port
     self.auth_input = auth_input
     self.cookie_path = cookie_path
-        
     self.br = mechanize.Browser()
     self.br.set_handle_robots(False)
     
