@@ -9,16 +9,10 @@ try:
 except IOError:
     README = ''
 
-try:
-  REQUIRES=open(os.path.join(HERE, "requirements.txt")).readlines()
-except IOError:
-  REQUIRES=[]
-
-
 setup(
   name='trivio',
   packages=find_packages(),
-  version='0.2.5',
+  version='0.2.6',
   description='triv.io command line client',
   long_description=README,
   author='Scott Robertson',
@@ -38,5 +32,22 @@ setup(
       'trivio = triv.io.client:main',
     ]
   },
-  install_requires=REQUIRES,
+  dependency_links = [
+    'https://github.com/trivio/leisure/tarball/master#egg=leisure-0.0.4',
+    'https://github.com/trivio/codd/tarball/master#egg=codd-0.1.5',
+    'https://github.com/trivio/trivio.datasources/tarball/master#egg=trivio.datasources-0.0.2',
+
+  ],
+  install_requires=[
+    'codd>=0.1.6',
+    'leisure',
+    'mechanize>=0.2.5',
+    'requests>=1.0.4',
+    'websocket',
+    'python-dateutil==1.5',
+    'docopt',
+    'schema',
+    'virtualenv >= 1.9.1',
+    'trivio.datasources >= 0.0.2'
+  ],
 )
